@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3ed">
+  <meta name="description" content="Notícias, ideias e descobertas para acompanhar o que acontece.">
+  <title>Panorama — Notícias e ideias</title>
+  <link rel="icon" href="assets/placeholder.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="noticias.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="Panorama, página inicial">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>panorama<span class="brand-period">.</span></span>
+    </a>
+    <p class="header-note">O mundo em perspectiva</p>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> Informação que aproxima</p>
+      <h1 id="page-title">Um olhar mais amplo<br>sobre <span>o agora.</span></h1>
+      <p class="intro-copy">Histórias, ideias e descobertas para entender melhor o mundo à sua volta.</p>
+    </section>
+
+    <section class="news-section" aria-labelledby="news-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow section-eyebrow">Da redação</p>
+          <h2 id="news-heading">Últimas notícias</h2>
+        </div>
+        <label class="filter-label" for="category-filter">
+          <span>Explorar por</span>
+          <select id="category-filter" aria-label="Filtrar notícias por categoria">
+            <option value="todas">Todas as categorias</option>
+          </select>
+        </label>
+      </div>
+
+      <p id="results-count" class="results-count" aria-live="polite"></p>
+      <div id="news-list" class="news-grid" aria-live="polite"></div>
+      <p id="empty-state" class="empty-state" hidden>Nenhuma notícia encontrada nesta categoria.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand footer-brand" href="#" aria-label="Panorama, página inicial">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>panorama<span class="brand-period">.</span></span>
+    </a>
+    <p>Feito para olhar o mundo com curiosidade.</p>
+    <span class="copyright">© 2026 Panorama</span>
+  </footer>
+
+  <dialog id="article-dialog" class="article-dialog" aria-labelledby="dialog-title">
+    <article class="dialog-content">
+      <button class="dialog-close" type="button" aria-label="Fechar notícia">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <img id="dialog-image" class="dialog-image" src="assets/placeholder.svg" alt="">
+      <div class="dialog-body">
+        <p id="dialog-category" class="article-category"></p>
+        <p id="dialog-date" class="article-date"></p>
+        <h2 id="dialog-title"></h2>
+        <p id="dialog-summary" class="dialog-summary"></p>
+        <div id="dialog-text" class="dialog-text"></div>
+      </div>
+    </article>
+  </dialog>
+</body>
+</html>
