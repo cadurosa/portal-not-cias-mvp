@@ -1,4 +1,4 @@
-const noticias = [
+const noticiasIniciais = [
   {
     id: 1,
     title: "Laboratório brasileiro desenvolve bateria de longa duração",
@@ -80,15 +80,67 @@ const resultsCount = document.querySelector("#results-count");
 const emptyState = document.querySelector("#empty-state");
 const articleDialog = document.querySelector("#article-dialog");
 const closeDialogButton = document.querySelector(".dialog-close");
+const newsFormDialog = document.querySelector("#news-form-dialog");
+const newsForm = document.querySelector("#news-form");
+const openNewsFormButton = document.querySelector("#open-news-form");
+const appStatus = document.querySelector("#app-status");
+const storageKey = "panorama-noticias";
+const allowedCategories = ["Tecnologia", "Esportes", "Economia"];
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "numeric",
   month: "long",
   year: "numeric"
 });
 let selectedCategory = "Todas";
+let savedNews = loadSavedNews();
+let noticias = [...savedNews, ...noticiasIniciais];
 
 function formatDate(date) {
   return dateFormatter.format(new Date(`${date}T12:00:00`));
+}
+
+function setAppStatus(message) {
+  appStatus.textContent = message;
+}
+
+function isSavedNews(noticia) {
+  return noticia &&
+    typeof noticia.id === "string" &&
+    typeof noticia.title === "string" &&
+    noticia.title.trim() &&
+    allowedCategories.includes(noticia.category) &&
+    /^\d{4}-\d{2}-\d{2}$/.test(noticia.date) &&
+    typeof noticia.summary === "string" &&
+    Array.isArray(noticia.content) &&
+    noticia.content.length > 0 &&
+    noticia.content.every((paragraph) => typeof paragraph === "string" && paragraph.trim());
+}
+
+function loadSavedNews() {
+  try {
+    const storedNews = localStorage.getItem(storageKey);
+    if (!storedNews) {
+      return [];
+    }
+
+    const parsedNews = JSON.parse(storedNews);
+    if (!Array.isArray(parsedNews)) {
+      throw new Error("Os dados salvos não estão no formato esperado.");
+    }
+
+    const validNews = parsedNews.filter(isSavedNews);
+    if (validNews.length !== parsedNews.length) {
+      setAppStatus("Algumas notícias salvas não puderam ser carregadas.");
+    }
+
+    return validNews.map((noticia) => ({
+      ...noticia,
+      image: "assets/placeholder.svg"
+    }));
+  } catch {
+    setAppStatus("Não foi possível carregar as notícias salvas neste navegador.");
+    return [];
+  }
 }
 
 function createNewsCard(noticia) {
@@ -122,7 +174,7 @@ function createNewsCard(noticia) {
 
   const summary = document.createElement("p");
   summary.className = "card-summary";
-  summary.textContent = noticia.summary;
+  summary.textContent = noticia.summary || noticia.content[0];
 
   const readButton = document.createElement("button");
   readButton.className = "read-button";
@@ -160,7 +212,7 @@ function openArticle(noticia) {
   date.textContent = formatDate(noticia.date);
 
   document.querySelector("#dialog-title").textContent = noticia.title;
-  document.querySelector("#dialog-summary").textContent = noticia.summary;
+  document.querySelector("#dialog-summary").textContent = noticia.summary || noticia.content[0];
   document.querySelector("#dialog-text").replaceChildren(
     ...noticia.content.map((paragraphText) => {
       const paragraph = document.createElement("p");
@@ -199,6 +251,71 @@ articleDialog.addEventListener("click", (event) => {
   if (event.target === articleDialog) {
     articleDialog.close();
   }
+});
+
+function closeNewsForm() {
+  newsFormDialog.close();
+}
+
+openNewsFormButton.addEventListener("click", () => newsFormDialog.showModal());
+document.querySelector("#close-news-form").addEventListener("click", closeNewsForm);
+document.querySelector("#cancel-news-form").addEventListener("click", closeNewsForm);
+newsFormDialog.addEventListener("click", (event) => {
+  if (event.target === newsFormDialog) {
+    closeNewsForm();
+  }
+});
+
+newsForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const formData = new FormData(newsForm);
+  const title = formData.get("title").trim();
+  const category = formData.get("category");
+  const summary = formData.get("summary").trim();
+  const content = formData.get("content")
+    .split(/\n+/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  if (!title || !allowedCategories.includes(category) || content.length === 0) {
+    return;
+  }
+
+  const now = new Date();
+  const noticia = {
+    id: `${now.getTime()}-${Math.random().toString(36).slice(2)}`,
+    title,
+    category,
+    date: [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0")
+    ].join("-"),
+    summary,
+    content,
+    image: "assets/placeholder.svg"
+  };
+
+  savedNews.unshift(noticia);
+  noticias.unshift(noticia);
+  searchInput.value = "";
+  selectedCategory = category;
+  for (const button of categoryButtons) {
+    button.setAttribute("aria-pressed", String(button.dataset.category === category));
+  }
+  renderNews();
+
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(savedNews));
+    setAppStatus("Notícia publicada e salva neste navegador.");
+  } catch {
+    setAppStatus("Notícia publicada nesta sessão, mas não foi possível salvá-la neste navegador.");
+  }
+
+  newsForm.reset();
+  closeNewsForm();
+  openNewsFormButton.focus();
 });
 
 renderNews();
