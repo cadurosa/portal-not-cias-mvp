@@ -8,7 +8,7 @@
   <title>Panorama — Notícias e ideias</title>
   <link rel="icon" href="assets/placeholder.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <script src="noticias.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -32,17 +32,21 @@
           <p class="eyebrow section-eyebrow">Da redação</p>
           <h2 id="news-heading">Últimas notícias</h2>
         </div>
-        <label class="filter-label" for="category-filter">
-          <span>Explorar por</span>
-          <select id="category-filter" aria-label="Filtrar notícias por categoria">
-            <option value="todas">Todas as categorias</option>
-          </select>
-        </label>
+        <div class="filter-panel">
+          <label class="search-label" for="news-search">Buscar por título</label>
+          <input id="news-search" class="search-input" type="search" placeholder="Ex.: inovação" autocomplete="off">
+          <div class="category-controls" role="group" aria-label="Filtrar notícias por categoria">
+            <button class="category-button" type="button" data-category="Todas" aria-pressed="true">Todas</button>
+            <button class="category-button" type="button" data-category="Tecnologia" aria-pressed="false">Tecnologia</button>
+            <button class="category-button" type="button" data-category="Esportes" aria-pressed="false">Esportes</button>
+            <button class="category-button" type="button" data-category="Economia" aria-pressed="false">Economia</button>
+          </div>
+        </div>
       </div>
 
       <p id="results-count" class="results-count" aria-live="polite"></p>
       <div id="news-list" class="news-grid" aria-live="polite"></div>
-      <p id="empty-state" class="empty-state" hidden>Nenhuma notícia encontrada nesta categoria.</p>
+      <p id="empty-state" class="empty-state" hidden>Nenhuma notícia encontrada. Tente outra categoria ou busca.</p>
     </section>
   </main>
 

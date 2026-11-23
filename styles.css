@@ -25,7 +25,7 @@ body {
 }
 
 button,
-select {
+input {
   font: inherit;
 }
 
@@ -169,23 +169,57 @@ h1 span {
   letter-spacing: -0.8px;
 }
 
-.filter-label {
+.filter-panel {
   display: grid;
-  gap: 7px;
+  justify-items: end;
+  gap: 9px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 
-.filter-label select {
-  min-width: 205px;
-  padding: 11px 36px 11px 13px;
+.search-label {
+  justify-self: start;
+}
+
+.search-input {
+  width: min(100%, 360px);
+  padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--surface);
   color: var(--ink);
   font-size: 13px;
+}
+
+.search-input::placeholder {
+  color: #8a928d;
+}
+
+.category-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.category-button {
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.category-button:hover,
+.category-button[aria-pressed="true"] {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
 }
 
 .results-count {
@@ -470,9 +504,17 @@ h1 span {
     gap: 18px;
   }
 
-  .filter-label,
-  .filter-label select {
+  .filter-panel {
     width: 100%;
+    justify-items: stretch;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .category-controls {
+    justify-content: flex-start;
   }
 
   .news-grid {
