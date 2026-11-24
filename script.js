@@ -95,6 +95,10 @@ const openNewsFormButton = document.querySelector("#open-news-form");
 const appStatus = document.querySelector("#app-status");
 const storageKey = "panorama-noticias";
 const readStorageKey = "panorama-noticias-lidas";
+const themeStorageKey = "panorama-tema";
+const themeToggle = document.querySelector("#theme-toggle");
+const themeIcon = document.querySelector("#theme-icon");
+const themeLabel = document.querySelector("#theme-label");
 const allowedCategories = ["Tecnologia", "Esportes", "Economia"];
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "numeric",
@@ -112,6 +116,7 @@ let savedNews = loadSavedNews();
 let noticias = [...savedNews, ...noticiasIniciais];
 let readNews = loadReadNews();
 let openArticleNews = null;
+let currentTheme = loadThemePreference();
 
 function createQuoteCard(cotacao) {
   const card = document.createElement("article");
@@ -159,12 +164,49 @@ function renderQuotes() {
   quotesList.replaceChildren(...cotacoes.map(createQuoteCard));
 }
 
+applyTheme(currentTheme);
+
 function formatDate(date) {
   return dateFormatter.format(new Date(`${date}T12:00:00`));
 }
 
 function setAppStatus(message) {
   appStatus.textContent = message;
+}
+
+function loadThemePreference() {
+  try {
+    const storedTheme = localStorage.getItem(themeStorageKey);
+    if (storedTheme === "light" || storedTheme === "dark") {
+      return storedTheme;
+    }
+    if (storedTheme !== null) {
+      setAppStatus("A preferência de tema salva não é válida; usando o tema claro.");
+    }
+  } catch {
+    setAppStatus("Não foi possível carregar a preferência de tema neste navegador.");
+  }
+  return "light";
+}
+
+function applyTheme(theme) {
+  const isDark = theme === "dark";
+  document.documentElement.dataset.theme = theme;
+  themeToggle.setAttribute("aria-pressed", String(isDark));
+  themeToggle.setAttribute("aria-label", `Ativar tema ${isDark ? "claro" : "escuro"}`);
+  themeIcon.textContent = isDark ? "☀" : "☾";
+  themeLabel.textContent = `Tema ${isDark ? "claro" : "escuro"}`;
+  document.querySelector('meta[name="theme-color"]').content = isDark ? "#111922" : "#f4f7fa";
+}
+
+function setTheme(theme) {
+  currentTheme = theme;
+  applyTheme(currentTheme);
+  try {
+    localStorage.setItem(themeStorageKey, currentTheme);
+  } catch {
+    setAppStatus("Tema alterado nesta sessão, mas não foi possível salvar a preferência neste navegador.");
+  }
 }
 
 function loadReadNews() {
@@ -392,6 +434,9 @@ dialogReadToggle.addEventListener("click", () => {
 });
 
 searchInput.addEventListener("input", renderNews);
+themeToggle.addEventListener("click", () => {
+  setTheme(currentTheme === "dark" ? "light" : "dark");
+});
 closeDialogButton.addEventListener("click", () => articleDialog.close());
 articleDialog.addEventListener("close", () => {
   openArticleNews = null;
