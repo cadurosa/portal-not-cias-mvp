@@ -92,6 +92,11 @@ const dialogReadToggle = document.querySelector("#dialog-read-toggle");
 const newsFormDialog = document.querySelector("#news-form-dialog");
 const newsForm = document.querySelector("#news-form");
 const openNewsFormButton = document.querySelector("#open-news-form");
+const authToggleButton = document.querySelector("#auth-toggle");
+const loginDialog = document.querySelector("#login-dialog");
+const loginForm = document.querySelector("#login-form");
+const loginUsername = document.querySelector("#login-username");
+const loginError = document.querySelector("#login-error");
 const appStatus = document.querySelector("#app-status");
 const storageKey = "panorama-noticias";
 const readStorageKey = "panorama-noticias-lidas";
@@ -101,6 +106,7 @@ const themeToggle = document.querySelector("#theme-toggle");
 const themeIcon = document.querySelector("#theme-icon");
 const themeLabel = document.querySelector("#theme-label");
 const allowedCategories = ["Tecnologia", "Esportes", "Economia"];
+const adminCredentials = { username: "admin", password: "1234" };
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "numeric",
   month: "long",
@@ -120,6 +126,7 @@ let noticias = [...savedNews, ...noticiasIniciais]
 let readNews = loadReadNews();
 let openArticleNews = null;
 let currentTheme = loadThemePreference();
+let isAdmin = false;
 
 function createQuoteCard(cotacao) {
   const card = document.createElement("article");
@@ -390,16 +397,19 @@ function createNewsCard(noticia) {
     setNewsRead(noticia, !readNews.has(String(noticia.id)));
   });
 
-  const deleteButton = document.createElement("button");
-  deleteButton.className = "delete-news-button";
-  deleteButton.type = "button";
-  deleteButton.textContent = "Excluir";
-  deleteButton.setAttribute("aria-label", `Excluir notícia: ${noticia.title}`);
-  deleteButton.addEventListener("click", () => deleteNews(noticia));
-
   const actions = document.createElement("div");
   actions.className = "card-actions";
-  actions.append(readToggle, readButton, deleteButton);
+  actions.append(readToggle, readButton);
+  if (isAdmin) {
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "delete-news-button";
+    deleteButton.type = "button";
+    deleteButton.textContent = "Excluir";
+    deleteButton.setAttribute("aria-label", `Excluir notícia: ${noticia.title}`);
+    deleteButton.addEventListener("click", () => deleteNews(noticia));
+    actions.append(deleteButton);
+  }
+
   body.append(meta, title, summary, actions);
   card.append(image, body);
   return card;
@@ -421,6 +431,11 @@ function renderNews() {
 }
 
 function deleteNews(noticia) {
+  if (!isAdmin) {
+    setAppStatus("Entre como administrador para excluir notícias.");
+    return;
+  }
+
   if (!window.confirm(`Excluir “${noticia.title}”? Esta ação não pode ser desfeita.`)) {
     return;
   }
@@ -465,6 +480,66 @@ function openArticle(noticia) {
   articleDialog.showModal();
   closeDialogButton.focus();
 }
+
+function updateAccessControls() {
+  openNewsFormButton.hidden = !isAdmin;
+  newsFormDialog.hidden = !isAdmin;
+  authToggleButton.textContent = isAdmin ? "Sair" : "Entrar";
+  authToggleButton.setAttribute(
+    "aria-label",
+    isAdmin ? "Sair do modo administrador" : "Entrar no modo administrador"
+  );
+  renderNews();
+}
+
+function closeLoginDialog() {
+  loginDialog.close();
+}
+
+authToggleButton.addEventListener("click", () => {
+  if (isAdmin) {
+    isAdmin = false;
+    if (newsFormDialog.open) {
+      closeNewsForm();
+    }
+    newsForm.reset();
+    updateAccessControls();
+    setAppStatus("Modo leitor ativado.");
+    return;
+  }
+
+  loginError.hidden = true;
+  loginError.textContent = "";
+  loginForm.reset();
+  loginDialog.showModal();
+  loginUsername.focus();
+});
+
+loginForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const formData = new FormData(loginForm);
+  if (formData.get("username") !== adminCredentials.username ||
+      formData.get("password") !== adminCredentials.password) {
+    loginError.textContent = "Usuário ou senha inválidos.";
+    loginError.hidden = false;
+    return;
+  }
+
+  isAdmin = true;
+  closeLoginDialog();
+  updateAccessControls();
+  setAppStatus("Acesso de administrador ativado.");
+  openNewsFormButton.focus();
+});
+
+document.querySelector("#close-login-dialog").addEventListener("click", closeLoginDialog);
+document.querySelector("#cancel-login").addEventListener("click", closeLoginDialog);
+loginDialog.addEventListener("click", (event) => {
+  if (event.target === loginDialog) {
+    closeLoginDialog();
+  }
+});
 
 for (const button of categoryButtons) {
   button.addEventListener("click", () => {
@@ -516,7 +591,11 @@ function closeNewsForm() {
   newsFormDialog.close();
 }
 
-openNewsFormButton.addEventListener("click", () => newsFormDialog.showModal());
+openNewsFormButton.addEventListener("click", () => {
+  if (isAdmin) {
+    newsFormDialog.showModal();
+  }
+});
 document.querySelector("#close-news-form").addEventListener("click", closeNewsForm);
 document.querySelector("#cancel-news-form").addEventListener("click", closeNewsForm);
 newsFormDialog.addEventListener("click", (event) => {
@@ -527,6 +606,11 @@ newsFormDialog.addEventListener("click", (event) => {
 
 newsForm.addEventListener("submit", (event) => {
   event.preventDefault();
+
+  if (!isAdmin) {
+    setAppStatus("Entre como administrador para publicar notícias.");
+    return;
+  }
 
   const formData = new FormData(newsForm);
   const title = formData.get("title").trim();
@@ -577,5 +661,5 @@ newsForm.addEventListener("submit", (event) => {
   openNewsFormButton.focus();
 });
 
+updateAccessControls();
 renderQuotes();
-renderNews();

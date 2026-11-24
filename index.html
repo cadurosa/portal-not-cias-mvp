@@ -20,8 +20,9 @@
       <p class="header-note">O mundo em perspectiva</p>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
         <span id="theme-icon" class="theme-icon" aria-hidden="true">☾</span>
-        <span id="theme-label">Tema escuro</span>
+        <span id="theme-label" class="theme-label">Tema escuro</span>
       </button>
+      <button id="auth-toggle" class="theme-toggle auth-toggle" type="button">Entrar</button>
     </div>
   </header>
 
@@ -38,7 +39,7 @@
           <p class="eyebrow section-eyebrow">Mercado simulado</p>
           <h2 id="quotes-heading">Cotações do dia</h2>
         </div>
-        <p class="quotes-note">Valores ilustrativos, sem atualização em tempo real.</p>
+        <p class="quotes-note">Valores ilustrativos.</p>
       </div>
       <div id="quotes-list" class="quotes-grid" role="list"></div>
     </section>
@@ -59,7 +60,7 @@
             <button class="category-button" type="button" data-category="Economia" aria-pressed="false">Economia</button>
             <button id="unread-filter-button" class="category-button" type="button" aria-pressed="false">Apenas não lidas</button>
           </div>
-          <button id="open-news-form" class="add-news-button" type="button">+ Nova notícia</button>
+          <button id="open-news-form" class="add-news-button" type="button" hidden>+ Nova notícia</button>
         </div>
       </div>
 
@@ -96,7 +97,7 @@
     </article>
   </dialog>
 
-  <dialog id="news-form-dialog" class="news-form-dialog" aria-labelledby="form-title">
+  <dialog id="news-form-dialog" class="news-form-dialog" aria-labelledby="form-title" hidden>
     <form id="news-form" class="news-form">
       <button id="close-news-form" class="dialog-close" type="button" aria-label="Fechar formulário">
         <span aria-hidden="true">&times;</span>
@@ -118,6 +119,25 @@
       <div class="form-actions">
         <button id="cancel-news-form" class="cancel-button" type="button">Cancelar</button>
         <button class="add-news-button" type="submit">Publicar notícia</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="login-dialog" class="news-form-dialog" aria-labelledby="login-title">
+    <form id="login-form" class="news-form">
+      <button id="close-login-dialog" class="dialog-close" type="button" aria-label="Fechar login">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <p class="eyebrow">Acesso à redação</p>
+      <h2 id="login-title">Entrar</h2>
+      <label for="login-username">Usuário</label>
+      <input id="login-username" name="username" type="text" autocomplete="username" required>
+      <label for="login-password">Senha</label>
+      <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+      <p id="login-error" class="login-error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button id="cancel-login" class="cancel-button" type="button">Cancelar</button>
+        <button class="add-news-button" type="submit">Entrar</button>
       </div>
     </form>
   </dialog>

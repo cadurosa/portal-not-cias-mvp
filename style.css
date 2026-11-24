@@ -76,6 +76,7 @@ a { color: inherit; text-decoration: none; }
 .header-actions { display: flex; align-items: center; gap: 18px; }
 .theme-toggle { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 600; cursor: pointer; }
 .theme-toggle:hover { border-color: var(--accent); }
+.auth-toggle { white-space: nowrap; }
 .theme-icon { font-size: 15px; line-height: 1; }
 
 main { max-width: 1120px; margin: auto; padding: 0 24px; }
@@ -161,6 +162,7 @@ h1 { margin: 0; font-size: clamp(40px, 7vw, 66px); line-height: 1.08; letter-spa
 .news-form { position: relative; display: grid; gap: 9px; padding: 30px; }
 .news-form .eyebrow { margin-bottom: 0; }
 .news-form h2 { margin: 0 0 8px; font-size: 26px; }
+.login-error { margin: 0; color: var(--negative); font-size: 13px; }
 .news-form label { margin-top: 5px; font-size: 12px; font-weight: 700; }
 .news-form label span { color: var(--muted); font-weight: 400; }
 .news-form input, .news-form select, .news-form textarea { width: 100%; padding: 10px 11px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; }
@@ -172,8 +174,9 @@ h1 { margin: 0; font-size: clamp(40px, 7vw, 66px); line-height: 1.08; letter-spa
 @media (max-width: 850px) { .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) {
   .site-header { padding: 16px 20px; }
-  .header-actions { gap: 0; }
+  .header-actions { gap: 8px; }
   .header-note { display: none; }
+  .theme-label { display: none; }
   main { padding: 0 20px; }
   .intro { padding: 50px 0 42px; }
   .section-heading { align-items: flex-start; flex-direction: column; }
