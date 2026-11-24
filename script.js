@@ -95,6 +95,7 @@ const openNewsFormButton = document.querySelector("#open-news-form");
 const appStatus = document.querySelector("#app-status");
 const storageKey = "panorama-noticias";
 const readStorageKey = "panorama-noticias-lidas";
+const deletedNewsStorageKey = "panorama-noticias-excluidas";
 const themeStorageKey = "panorama-tema";
 const themeToggle = document.querySelector("#theme-toggle");
 const themeIcon = document.querySelector("#theme-icon");
@@ -113,7 +114,9 @@ const numberFormatter = new Intl.NumberFormat("pt-BR");
 let selectedCategory = "Todas";
 let showUnreadOnly = false;
 let savedNews = loadSavedNews();
-let noticias = [...savedNews, ...noticiasIniciais];
+let deletedNews = loadDeletedNews();
+let noticias = [...savedNews, ...noticiasIniciais]
+  .filter((noticia) => !deletedNews.has(String(noticia.id)));
 let readNews = loadReadNews();
 let openArticleNews = null;
 let currentTheme = loadThemePreference();
@@ -228,6 +231,29 @@ function loadReadNews() {
     return new Set(validIds);
   } catch {
     setAppStatus("Não foi possível carregar os estados de leitura neste navegador.");
+    return new Set();
+  }
+}
+
+function loadDeletedNews() {
+  try {
+    const storedNews = localStorage.getItem(deletedNewsStorageKey);
+    if (!storedNews) {
+      return new Set();
+    }
+
+    const parsedNews = JSON.parse(storedNews);
+    if (!Array.isArray(parsedNews)) {
+      throw new Error("Os itens excluídos não estão no formato esperado.");
+    }
+
+    const validIds = parsedNews.filter((id) => typeof id === "string");
+    if (validIds.length !== parsedNews.length) {
+      setAppStatus("Algumas exclusões salvas não puderam ser carregadas.");
+    }
+    return new Set(validIds);
+  } catch {
+    setAppStatus("Não foi possível carregar as exclusões salvas neste navegador.");
     return new Set();
   }
 }
@@ -364,9 +390,16 @@ function createNewsCard(noticia) {
     setNewsRead(noticia, !readNews.has(String(noticia.id)));
   });
 
+  const deleteButton = document.createElement("button");
+  deleteButton.className = "delete-news-button";
+  deleteButton.type = "button";
+  deleteButton.textContent = "Excluir";
+  deleteButton.setAttribute("aria-label", `Excluir notícia: ${noticia.title}`);
+  deleteButton.addEventListener("click", () => deleteNews(noticia));
+
   const actions = document.createElement("div");
   actions.className = "card-actions";
-  actions.append(readToggle, readButton);
+  actions.append(readToggle, readButton, deleteButton);
   body.append(meta, title, summary, actions);
   card.append(image, body);
   return card;
@@ -385,6 +418,28 @@ function renderNews() {
   resultsCount.textContent = `${filteredNews.length} ${filteredNews.length === 1 ? "notícia" : "notícias"}`;
   emptyState.hidden = filteredNews.length !== 0;
   newsList.hidden = filteredNews.length === 0;
+}
+
+function deleteNews(noticia) {
+  if (!window.confirm(`Excluir “${noticia.title}”? Esta ação não pode ser desfeita.`)) {
+    return;
+  }
+
+  const id = String(noticia.id);
+  noticias = noticias.filter((item) => String(item.id) !== id);
+  savedNews = savedNews.filter((item) => String(item.id) !== id);
+  deletedNews.add(id);
+  readNews.delete(id);
+  renderNews();
+
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(savedNews));
+    localStorage.setItem(deletedNewsStorageKey, JSON.stringify([...deletedNews]));
+    localStorage.setItem(readStorageKey, JSON.stringify([...readNews]));
+    setAppStatus("Notícia excluída.");
+  } catch {
+    setAppStatus("Notícia excluída nesta sessão, mas não foi possível salvar todas as alterações neste navegador.");
+  }
 }
 
 function openArticle(noticia) {

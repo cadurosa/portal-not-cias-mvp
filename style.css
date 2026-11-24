@@ -133,6 +133,8 @@ h1 { margin: 0; font-size: clamp(40px, 7vw, 66px); line-height: 1.08; letter-spa
 .read-status-button[aria-pressed="true"] { border-color: var(--read-line); background: var(--read-bg); color: var(--read-ink); }
 .read-status-button:hover { border-color: var(--accent); }
 .read-button { padding: 0; border: 0; background: none; color: var(--accent); font-size: 13px; font-weight: 700; cursor: pointer; }
+.delete-news-button { padding: 6px 0; border: 0; background: none; color: var(--muted); font-size: 11px; cursor: pointer; }
+.delete-news-button:hover { color: var(--negative); }
 .read-button::after { content: " →"; }
 .empty-state { padding: 26px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); text-align: center; }
 
