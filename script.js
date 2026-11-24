@@ -82,16 +82,19 @@ const cotacoes = [
 const newsList = document.querySelector("#news-list");
 const quotesList = document.querySelector("#quotes-list");
 const searchInput = document.querySelector("#news-search");
-const categoryButtons = [...document.querySelectorAll(".category-button")];
+const categoryButtons = [...document.querySelectorAll(".category-button[data-category]")];
+const unreadFilterButton = document.querySelector("#unread-filter-button");
 const resultsCount = document.querySelector("#results-count");
 const emptyState = document.querySelector("#empty-state");
 const articleDialog = document.querySelector("#article-dialog");
 const closeDialogButton = document.querySelector(".dialog-close");
+const dialogReadToggle = document.querySelector("#dialog-read-toggle");
 const newsFormDialog = document.querySelector("#news-form-dialog");
 const newsForm = document.querySelector("#news-form");
 const openNewsFormButton = document.querySelector("#open-news-form");
 const appStatus = document.querySelector("#app-status");
 const storageKey = "panorama-noticias";
+const readStorageKey = "panorama-noticias-lidas";
 const allowedCategories = ["Tecnologia", "Esportes", "Economia"];
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "numeric",
@@ -104,8 +107,11 @@ const currencyFormatter = new Intl.NumberFormat("pt-BR", {
 });
 const numberFormatter = new Intl.NumberFormat("pt-BR");
 let selectedCategory = "Todas";
+let showUnreadOnly = false;
 let savedNews = loadSavedNews();
 let noticias = [...savedNews, ...noticiasIniciais];
+let readNews = loadReadNews();
+let openArticleNews = null;
 
 function createQuoteCard(cotacao) {
   const card = document.createElement("article");
@@ -159,6 +165,63 @@ function formatDate(date) {
 
 function setAppStatus(message) {
   appStatus.textContent = message;
+}
+
+function loadReadNews() {
+  try {
+    const storedNews = localStorage.getItem(readStorageKey);
+    if (!storedNews) {
+      return new Set();
+    }
+
+    const parsedNews = JSON.parse(storedNews);
+    if (!Array.isArray(parsedNews)) {
+      throw new Error("Os estados de leitura não estão no formato esperado.");
+    }
+
+    const validIds = parsedNews.filter((id) => typeof id === "string");
+    if (validIds.length !== parsedNews.length) {
+      setAppStatus("Alguns estados de leitura salvos não puderam ser carregados.");
+    }
+    return new Set(validIds);
+  } catch {
+    setAppStatus("Não foi possível carregar os estados de leitura neste navegador.");
+    return new Set();
+  }
+}
+
+function updateReadButton(button, noticia) {
+  const isRead = readNews.has(String(noticia.id));
+  button.textContent = isRead ? "Lida" : "Não lida";
+  button.setAttribute("aria-pressed", String(isRead));
+  button.setAttribute(
+    "aria-label",
+    `${isRead ? "Marcar como não lida" : "Marcar como lida"}: ${noticia.title}`
+  );
+}
+
+function setNewsRead(noticia, isRead) {
+  const id = String(noticia.id);
+  const wasRead = readNews.has(id);
+  if (wasRead === isRead) {
+    updateReadButton(dialogReadToggle, noticia);
+    return;
+  }
+
+  if (isRead) {
+    readNews.add(id);
+  } else {
+    readNews.delete(id);
+  }
+
+  try {
+    localStorage.setItem(readStorageKey, JSON.stringify([...readNews]));
+  } catch {
+    setAppStatus("Estado de leitura atualizado nesta sessão, mas não foi possível salvá-lo neste navegador.");
+  }
+
+  renderNews();
+  updateReadButton(dialogReadToggle, noticia);
 }
 
 function isSavedNews(noticia) {
@@ -226,6 +289,16 @@ function createNewsCard(noticia) {
   date.dateTime = noticia.date;
   date.textContent = formatDate(noticia.date);
 
+  const isRead = readNews.has(String(noticia.id));
+  if (isRead) {
+    const readBadge = document.createElement("span");
+    readBadge.className = "read-badge";
+    readBadge.textContent = "Lida";
+    meta.append(category, date, readBadge);
+  } else {
+    meta.append(category, date);
+  }
+
   const title = document.createElement("h3");
   title.className = "card-title";
   title.textContent = noticia.title;
@@ -241,8 +314,18 @@ function createNewsCard(noticia) {
   readButton.setAttribute("aria-label", `Ler mais: ${noticia.title}`);
   readButton.addEventListener("click", () => openArticle(noticia));
 
-  meta.append(category, date);
-  body.append(meta, title, summary, readButton);
+  const readToggle = document.createElement("button");
+  readToggle.className = "read-status-button";
+  readToggle.type = "button";
+  updateReadButton(readToggle, noticia);
+  readToggle.addEventListener("click", () => {
+    setNewsRead(noticia, !readNews.has(String(noticia.id)));
+  });
+
+  const actions = document.createElement("div");
+  actions.className = "card-actions";
+  actions.append(readToggle, readButton);
+  body.append(meta, title, summary, actions);
   card.append(image, body);
   return card;
 }
@@ -252,7 +335,8 @@ function renderNews() {
   const filteredNews = noticias.filter((noticia) => {
     const matchesCategory = selectedCategory === "Todas" || noticia.category === selectedCategory;
     const matchesTitle = noticia.title.toLocaleLowerCase("pt-BR").includes(searchTerm);
-    return matchesCategory && matchesTitle;
+    const matchesReadStatus = !showUnreadOnly || !readNews.has(String(noticia.id));
+    return matchesCategory && matchesTitle && matchesReadStatus;
   });
 
   newsList.replaceChildren(...filteredNews.map(createNewsCard));
@@ -262,6 +346,7 @@ function renderNews() {
 }
 
 function openArticle(noticia) {
+  openArticleNews = noticia;
   document.querySelector("#dialog-image").src = noticia.image;
   document.querySelector("#dialog-category").textContent = noticia.category;
 
@@ -279,6 +364,7 @@ function openArticle(noticia) {
     })
   );
 
+  setNewsRead(noticia, true);
   articleDialog.showModal();
   closeDialogButton.focus();
 }
@@ -293,8 +379,23 @@ for (const button of categoryButtons) {
   });
 }
 
+unreadFilterButton.addEventListener("click", () => {
+  showUnreadOnly = !showUnreadOnly;
+  unreadFilterButton.setAttribute("aria-pressed", String(showUnreadOnly));
+  renderNews();
+});
+
+dialogReadToggle.addEventListener("click", () => {
+  if (openArticleNews) {
+    setNewsRead(openArticleNews, !readNews.has(String(openArticleNews.id)));
+  }
+});
+
 searchInput.addEventListener("input", renderNews);
 closeDialogButton.addEventListener("click", () => articleDialog.close());
+articleDialog.addEventListener("close", () => {
+  openArticleNews = null;
+});
 articleDialog.addEventListener("cancel", (event) => {
   event.preventDefault();
   articleDialog.close();

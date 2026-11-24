@@ -46,11 +46,12 @@
         <div class="filter-panel">
           <label class="search-label" for="news-search">Buscar por título</label>
           <input id="news-search" class="search-input" type="search" placeholder="Ex.: inovação" autocomplete="off">
-          <div class="category-controls" role="group" aria-label="Filtrar notícias por categoria">
+          <div class="category-controls" role="group" aria-label="Filtrar notícias">
             <button class="category-button" type="button" data-category="Todas" aria-pressed="true">Todas</button>
             <button class="category-button" type="button" data-category="Tecnologia" aria-pressed="false">Tecnologia</button>
             <button class="category-button" type="button" data-category="Esportes" aria-pressed="false">Esportes</button>
             <button class="category-button" type="button" data-category="Economia" aria-pressed="false">Economia</button>
+            <button id="unread-filter-button" class="category-button" type="button" aria-pressed="false">Apenas não lidas</button>
           </div>
           <button id="open-news-form" class="add-news-button" type="button">+ Nova notícia</button>
         </div>
@@ -81,6 +82,7 @@
       <div class="dialog-body">
         <p id="dialog-category" class="article-category"></p>
         <p id="dialog-date" class="article-date"></p>
+        <button id="dialog-read-toggle" class="read-status-button" type="button" aria-pressed="false"></button>
         <h2 id="dialog-title"></h2>
         <p id="dialog-summary" class="dialog-summary"></p>
         <div id="dialog-text" class="dialog-text"></div>
