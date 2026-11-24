@@ -42,6 +42,23 @@ main { max-width: 1120px; margin: auto; padding: 0 24px; }
 h1 { margin: 0; font-size: clamp(40px, 7vw, 66px); line-height: 1.08; letter-spacing: -2px; }
 .intro-copy { max-width: 490px; margin: 16px 0 0; line-height: 1.7; }
 
+.quotes-section { margin-bottom: 36px; padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.quotes-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.quotes-heading h2 { margin: 0; font-size: 21px; }
+.quotes-note { margin: 0; color: var(--muted); font-size: 12px; }
+.quotes-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.quote-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fbfcfd; }
+.quote-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.quote-symbol, .quote-name, .quote-value, .quote-change { margin: 0; }
+.quote-symbol { font-size: 14px; }
+.quote-name { overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.quote-value { margin-top: 14px; font-size: 22px; font-weight: 700; letter-spacing: -.4px; }
+.quote-change { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 12px; font-weight: 700; }
+.quote-change--up { color: #167447; }
+.quote-change--down { color: #b33a3a; }
+.quote-change--stable { color: var(--muted); }
+.quote-indicator { font-size: 10px; }
+
 .news-section { padding: 30px 0 72px; border-top: 1px solid var(--line); }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
 .section-eyebrow { margin-bottom: 6px; }
@@ -107,6 +124,13 @@ h1 { margin: 0; font-size: clamp(40px, 7vw, 66px); line-height: 1.08; letter-spa
   main { padding: 0 20px; }
   .intro { padding: 50px 0 42px; }
   .section-heading { align-items: flex-start; flex-direction: column; }
+  .quotes-section { padding: 18px; }
+  .quotes-heading { align-items: flex-start; flex-direction: column; }
+  .quotes-grid { grid-template-columns: 1fr; gap: 9px; }
+  .quote-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 3px 12px; padding: 12px 14px; }
+  .quote-heading { grid-column: 1; justify-content: flex-start; gap: 8px; }
+  .quote-value { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; font-size: 19px; text-align: right; }
+  .quote-change { grid-column: 1; margin-top: 0; }
   .filter-panel { width: 100%; justify-items: stretch; }
   .add-news-button { justify-self: start; }
   .search-input { width: 100%; }

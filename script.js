@@ -73,7 +73,14 @@ const noticiasIniciais = [
   }
 ];
 
+const cotacoes = [
+  { symbol: "USD", name: "Dólar americano", value: 5.72, variation: 0.42, type: "currency" },
+  { symbol: "EUR", name: "Euro", value: 6.18, variation: -0.18, type: "currency" },
+  { symbol: "IBOV", name: "Ibovespa", value: 132845, variation: 0.76, type: "index" }
+];
+
 const newsList = document.querySelector("#news-list");
+const quotesList = document.querySelector("#quotes-list");
 const searchInput = document.querySelector("#news-search");
 const categoryButtons = [...document.querySelectorAll(".category-button")];
 const resultsCount = document.querySelector("#results-count");
@@ -91,9 +98,60 @@ const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   month: "long",
   year: "numeric"
 });
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL"
+});
+const numberFormatter = new Intl.NumberFormat("pt-BR");
 let selectedCategory = "Todas";
 let savedNews = loadSavedNews();
 let noticias = [...savedNews, ...noticiasIniciais];
+
+function createQuoteCard(cotacao) {
+  const card = document.createElement("article");
+  card.className = "quote-card";
+  card.setAttribute("role", "listitem");
+
+  const heading = document.createElement("div");
+  heading.className = "quote-heading";
+
+  const symbol = document.createElement("h3");
+  symbol.className = "quote-symbol";
+  symbol.textContent = cotacao.symbol;
+
+  const name = document.createElement("p");
+  name.className = "quote-name";
+  name.textContent = cotacao.name;
+
+  const value = document.createElement("p");
+  value.className = "quote-value";
+  value.textContent = cotacao.type === "currency"
+    ? currencyFormatter.format(cotacao.value)
+    : `${numberFormatter.format(cotacao.value)} pts`;
+
+  const direction = cotacao.variation > 0 ? "up" : cotacao.variation < 0 ? "down" : "stable";
+  const change = document.createElement("p");
+  change.className = `quote-change quote-change--${direction}`;
+  const indicator = document.createElement("span");
+  indicator.className = "quote-indicator";
+  indicator.setAttribute("aria-hidden", "true");
+  indicator.textContent = direction === "up" ? "▲" : direction === "down" ? "▼" : "•";
+  const changeText = document.createElement("span");
+  const formattedVariation = `${cotacao.variation > 0 ? "+" : ""}${cotacao.variation.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}%`;
+  changeText.textContent = `${direction === "up" ? "Alta" : direction === "down" ? "Baixa" : "Estável"}: ${formattedVariation}`;
+  change.append(indicator, changeText);
+
+  heading.append(symbol, name);
+  card.append(heading, value, change);
+  return card;
+}
+
+function renderQuotes() {
+  quotesList.replaceChildren(...cotacoes.map(createQuoteCard));
+}
 
 function formatDate(date) {
   return dateFormatter.format(new Date(`${date}T12:00:00`));
@@ -318,4 +376,5 @@ newsForm.addEventListener("submit", (event) => {
   openNewsFormButton.focus();
 });
 
+renderQuotes();
 renderNews();
