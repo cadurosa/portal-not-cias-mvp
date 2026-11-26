@@ -9,7 +9,7 @@ const noticiasIniciais = [
       "Uma equipe de pesquisadores brasileiros apresentou um protótipo de bateria que mantém o desempenho por mais ciclos de recarga. O projeto usa materiais abundantes e métodos de fabricação pensados para facilitar a produção em escala.",
       "Os próximos testes vão avaliar a eficiência em diferentes temperaturas e condições de uso. A equipe também pretende compartilhar os resultados com empresas interessadas em desenvolver aplicações para dispositivos portáteis."
     ],
-    image: "assets/placeholder.svg"
+    image: "assets/lab.jpg"
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const noticiasIniciais = [
       "Uma rede de escolas públicas iniciou oficinas de programação e robótica com atividades práticas para estudantes. Os grupos constroem protótipos, aprendem conceitos de lógica e trabalham em conjunto para resolver desafios.",
       "Educadores destacam que o objetivo é estimular a criatividade e a autonomia, sem exigir experiência prévia. Ao fim do semestre, as turmas vão apresentar seus projetos para famílias e para a comunidade escolar."
     ],
-    image: "assets/placeholder.svg"
+    image: "assets/escola.jpg"
   },
   {
     id: 3,
@@ -33,7 +33,7 @@ const noticiasIniciais = [
       "A equipe feminina da cidade conquistou o campeonato regional depois de uma final disputada até os últimos minutos. O grupo virou o placar na etapa final, diante de uma torcida que lotou o ginásio.",
       "A campanha foi marcada pela consistência defensiva e pela participação de atletas jovens. A comissão técnica agora prepara o elenco para a próxima etapa da competição."
     ],
-    image: "assets/placeholder.svg"
+    image: "assets/esporte.jpg"
   },
   {
     id: 4,
@@ -45,7 +45,7 @@ const noticiasIniciais = [
       "Centenas de moradores participaram de uma corrida comunitária realizada no parque municipal. O evento ofereceu diferentes distâncias e uma caminhada acessível para quem preferiu aproveitar o percurso em ritmo tranquilo.",
       "Voluntários e organizações locais ajudaram a orientar os participantes e distribuir água. A iniciativa também marcou a reabertura de áreas do parque que passaram por melhorias recentes."
     ],
-    image: "assets/placeholder.svg"
+    image: "assets/corrida.jpg"
   },
   {
     id: 5,
@@ -57,7 +57,7 @@ const noticiasIniciais = [
       "Uma feira semanal de produtores locais vem ajudando pequenos negócios a encontrar novos clientes. Alimentos, artesanato e produtos feitos na região ocupam as bancas, em um espaço que também recebe música e atividades para as famílias.",
       "Os empreendedores dizem que a venda direta permite apresentar melhor seus produtos e entender o que os consumidores procuram. A organização estuda ampliar a programação e incluir novos expositores nos próximos meses."
     ],
-    image: "assets/placeholder.svg"
+    image: "assets/feira.jpg"
   },
   {
     id: 6,
@@ -69,7 +69,7 @@ const noticiasIniciais = [
       "Uma cooperativa regional lançou um fundo de microcrédito voltado a empreendedoras que buscam investir ou organizar seus negócios. Além do financiamento, as participantes terão acesso a oficinas de planejamento e orientação financeira.",
       "A iniciativa pretende fortalecer empresas locais e incentivar a troca de experiências. As primeiras vagas serão destinadas a projetos que ainda não têm acesso fácil a linhas tradicionais de crédito."
     ],
-    image: "assets/placeholder.svg"
+    image: "assets/coop.jpg"
   }
 ];
 
@@ -106,6 +106,11 @@ const themeToggle = document.querySelector("#theme-toggle");
 const themeIcon = document.querySelector("#theme-icon");
 const themeLabel = document.querySelector("#theme-label");
 const allowedCategories = ["Tecnologia", "Esportes", "Economia"];
+const categoryImages = {
+  Tecnologia: "assets/lab.jpg",
+  Esportes: "assets/esporte.jpg",
+  Economia: "assets/coop.jpg"
+};
 const adminCredentials = { username: "admin", password: "1234" };
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "numeric",
@@ -331,7 +336,7 @@ function loadSavedNews() {
 
     return validNews.map((noticia) => ({
       ...noticia,
-      image: "assets/placeholder.svg"
+      image: categoryImages[noticia.category]
     }));
   } catch {
     setAppStatus("Não foi possível carregar as notícias salvas neste navegador.");
@@ -637,7 +642,7 @@ newsForm.addEventListener("submit", (event) => {
     ].join("-"),
     summary,
     content,
-    image: "assets/placeholder.svg"
+    image: categoryImages[category]
   };
 
   savedNews.unshift(noticia);

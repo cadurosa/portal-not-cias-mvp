@@ -11,7 +11,7 @@ O painel de cotações exibe valores simulados para USD, EUR e IBOV, sem chamada
 - `index.html` — estrutura semântica da página, painel de cotações, busca, filtros, controles de tema e modais.
 - `script.js` — notícias iniciais e cotações simuladas; lógica de renderização, busca, filtros, leitura, publicação, exclusão e preferências locais.
 - `style.css` — estilos responsivos para os temas claro e escuro, cabeçalho, cotações, cartões, filtros e modais.
-- `assets/placeholder.svg` — imagem ilustrativa local usada nas notícias.
+- `assets/` — capas locais das notícias (`lab.jpg`, `escola.jpg`, `esporte.jpg`, `corrida.jpg`, `feira.jpg` e `coop.jpg`); `placeholder.svg` é usado como ícone do site.
 - `CLAUDE.md` — diretrizes e requisitos de implementação do projeto.
 
 ## Como rodar
@@ -27,6 +27,7 @@ Não é necessário instalar dependências, configurar um servidor ou fazer uma 
 - Acesso inicia em modo leitor; o login demonstrativo `admin` / `1234` libera publicação e exclusão. A autenticação é apenas didática e não oferece segurança real.
 - Quadro de cotações ilustrativas de USD, EUR e IBOV, incluindo variação e indicação de alta ou baixa.
 - Botão no cabeçalho para alternar tema claro/escuro, com preferência salva localmente.
+- Capas locais associadas ao tema de cada notícia; imagens de cartões e do modal usam proporção uniforme, `object-fit: cover` e `object-position: center`.
 - Layout responsivo e controles acessíveis por teclado.
 
 ## Uso de prompts
@@ -44,5 +45,6 @@ O desenvolvimento foi orientado por prompts em etapas:
 9. Adicionar um botão discreto para excluir notícias dos cartões, pedir confirmação e persistir a remoção.
 10. Simular acesso de leitor e administrador, ocultando e bloqueando ações de publicação e exclusão até autenticar.
 11. Documentar o objetivo, os arquivos, as funcionalidades e a execução do projeto, além de registrar no README como os prompts orientaram as etapas.
+12. Substituir as capas placeholder das notícias por imagens locais correspondentes aos temas e padronizar proporção e enquadramento das imagens nos cartões e no modal.
 
-As solicitações foram implementadas e refinadas em sequência. A validação incluiu listagem, filtros e busca, modal e estado de leitura, publicação, painel de cotações, alternância e persistência do tema e apresentação em telas menores.
+As solicitações foram implementadas e refinadas em sequência. A validação incluiu listagem, filtros e busca, modal e estado de leitura, publicação, painel de cotações, alternância e persistência do tema, apresentação em telas menores e verificação dos caminhos das capas locais.
